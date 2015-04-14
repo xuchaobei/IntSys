@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The contents of this file will be loaded for each web application --><Context>
+
+    <!-- Default set of monitored resources -->
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+	
+    <!-- Uncomment this to disable session persistence across Tomcat restarts -->
+    <!--
+    <Manager pathname="" />
+    -->
+
+    <!-- Uncomment this to enable Comet connection tacking (provides events
+         on session expiration as well as webapp lifecycle) -->
+    <!--
+    <Valve className="org.apache.catalina.valves.CometConnectionManagerValve" />
+    -->
+<Resource
+            name="jdbc/foodDB"
+            driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
+            maxActive="50"
+            maxIdle="10"
+            maxWait="10000"
+            username="sa"
+            password="112358"
+            type="javax.sql.DataSource"
+            url="jdbc:sqlserver://10.31.46.139:3319;database=food_sh;" />
+ <Resource
+            name="jdbc/hzpDB"
+            driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
+            maxActive="50"
+            maxIdle="10"
+            maxWait="10000"
+            username="sa"
+            password="112358"
+            type="javax.sql.DataSource"
+            url="jdbc:sqlserver://10.31.46.36:3319;database=sh_hzp;" />
+</Context>
