@@ -53,10 +53,8 @@ public class LRPServlet  extends HttpServlet{
 		Date date = new Date();
 		Date date1=new Date();
 		//定义读取基础数据开始时间字符串
-		//String timeStr = "1:00:00"; 
-		//String timeStr1="23:00:00";
-		String timeStr = "14:45:00"; 
-        String timeStr1="14:45:00";
+		String timeStr = "1:00:00"; 
+		String timeStr1="23:00:00";
 		timeStr = sdf.format(date)+timeStr;
 		timeStr1=sdf.format(date1)+timeStr1;
 		//获得当天的指定时间的date对象

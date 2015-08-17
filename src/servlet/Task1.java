@@ -1,18 +1,12 @@
 package servlet;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.TimerTask;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -36,7 +30,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import action.ExportXml;
 import dao.DaoTask1;
 
 
@@ -68,7 +61,8 @@ public class Task1 extends TimerTask {
 	public void run() {
 		// TODO Auto-generated method stub
 		try{
-			if (!isRunning) {							
+			if (!isRunning) {
+				isRunning = true;
 				SaveLabAppliant(); // 成功					
 				SaveLabApplyDept(); // 成功				
 				SaveLabApplyKind(); // 成功				
@@ -870,14 +864,8 @@ public class Task1 extends TimerTask {
 								}
 							}
 						}
-    					if("赭曲霉毒素A".equals(itemName) || "氨基甲酸乙酯".equals(itemName) ){
-    					    log.info("读取到检测项目： "+itemCode+"--"+itemName);
-                        }
     					DaoTask1.SaveLabItemDao("food", itemCode, itemName, testItemID, testItemCode, itemID, standardNo, standardName, productCategoryCode, productCategoryName, detectionLimit, resultUnit, limit, testPeriod, testFee, deptID,testGroupID,testGroupName,defaultUserID,defaultUserName);
     					DaoTask1.SaveLabItemDao("hzp", itemCode, itemName, testItemID, testItemCode, itemID, standardNo, standardName, productCategoryCode, productCategoryName, detectionLimit, resultUnit, limit, testPeriod, testFee, deptID,testGroupID,testGroupName,defaultUserID,defaultUserName);
-    				    if("赭曲霉毒素A".equals(itemName) || "氨基甲酸乙酯".equals(itemName) ){
-                            log.info("检测项目保存完成： "+itemCode+"--"+itemName);
-                        }
 					    
 					}						
 				}
@@ -915,355 +903,6 @@ public class Task1 extends TimerTask {
 		return "success";
 	}
 	
-	public String SaveLabItem2(File file) { 
-        labItem=false;
-        HttpClient httpclient = new DefaultHttpClient();
-        try {
-            HttpPost httpPost;
-            HttpResponse response;
-            HttpEntity entity;
-            BufferedReader rd;
-            StringBuffer temp;
-            String line;
-            String result;
-            Reader rr;
-            DocumentBuilderFactory builderFactory;
-            DocumentBuilder domBuilder;
-            Document document;
-            Element gsp;
-
-       /*     StringEntity stringEntity = new StringEntity(
-                    this.getHeader("LabItem"), "text/xml", "utf-8");
-            stringEntity.setChunked(true);
-            httpPost = new HttpPost(
-                    ConPool.getConfig().getLrpUrl()+"/TestItem/GetMultiple?apikey=bda11d91-7ade-4da1-855d-24adfe39d174&uid=1&uname=admin&utype=2");
-            httpPost.setEntity(stringEntity);
-            response = httpclient.execute(httpPost);
-            //System.out.println(response.getStatusLine());
-            log.info(response.getStatusLine());
-            entity = response.getEntity();*/
-
-            if (file != null) {
-                //InputStream stream = entity.getContent();           
-                
-                //rd = new BufferedReader(new InputStreamReader(stream, "utf-8"));
-                rd = new BufferedReader(new InputStreamReader(new FileInputStream(file),"utf-8"));
-                
-            
-                temp = new StringBuffer();
-                line = rd.readLine();
-                while (line != null) {
-                    temp.append(line).append("\r\n");
-                    line = rd.readLine();
-                }
-                rd.close();
-                //stream.close();
-                result = temp.toString();
-                ExportXml.export(result,"检测项目");       //导出结果到xml文件
-                //System.out.println(result);
-                rr = new StringReader(result);
-                builderFactory = DocumentBuilderFactory.newInstance();
-                domBuilder = builderFactory.newDocumentBuilder();
-                document = domBuilder.parse(new InputSource(rr));
-                gsp = document.getDocumentElement();
-                NodeList itemList = gsp.getElementsByTagName("abi_TestItem");
-                if (itemList != null) {
-                    for (int i = 0; i < itemList.getLength(); i++) {
-                        System.out.println("总数：" + itemList.getLength());
-                        Node item = itemList.item(i);
-                        String itemCode = null;
-                        String itemName = null;                     
-                        String testItemID=null;
-                        String testItemCode=null;
-                        String itemID=null;
-                        String standardNo=null;
-                        String standardName=null;                   
-                        String productCategoryCode = null;
-                        String productCategoryName=null;
-                        String detectionLimit = null;
-                        String resultUnit= null;
-                        String limit = null;
-                        String testPeriod= null;
-                        String testFee= null;
-                        String deptID= null;
-                        String testGroupID=null;
-                        String testGroupName=null;
-                        String defaultUserID=null;
-                        String defaultUserName=null;
-                        for (Node node = item.getFirstChild(); node != null; node = node
-                                .getNextSibling()) {
-                            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                if (node.getNodeName().equals("ItemCode")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        itemCode = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(itemCode);
-                                    }
-                                } else if (node.getNodeName()
-                                        .equals("ItemName")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        itemName = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(itemName);
-                                    }
-                                } else if (node.getNodeName().equals(
-                                        "TestItemID")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        testItemID = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(testItemID);
-                                    }
-                                } else if (node.getNodeName().equals(
-                                        "TestItemCode")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        testItemCode = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(testItemCode);
-                                    }
-                                } else if (node.getNodeName().equals(
-                                        "ItemID")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        itemID = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(itemID);
-                                    }
-                                } else if (node.getNodeName().equals(
-                                        "StandardName")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        standardName = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(standardName);
-                                    }
-                                } else if (node.getNodeName().equals(
-                                        "StandardNo")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        standardNo = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(standardNo);
-                                    }
-                                } else if (node.getNodeName().equals(
-                                        "ProductCategoryCode")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        productCategoryCode = node
-                                                .getFirstChild().getNodeValue();
-                                        //System.out.println(productCategoryCode);
-                                    }
-                                } else if (node.getNodeName().equals(
-                                        "ProductCategoryName")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        productCategoryName = node
-                                                .getFirstChild().getNodeValue();
-                                        //System.out.println(productCategoryName);
-                                    }
-                                } else if (node.getNodeName().equals(
-                                        "DetectionLimit")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        detectionLimit = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(detectionLimit);
-                                    }
-                                } else if (node.getNodeName().equals(
-                                        "ResultUnit")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        resultUnit = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(resultUnit);
-                                    }
-                                } else if (node.getNodeName().equals("Limit")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        limit = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(limit);
-                                    }
-                                } else if (node.getNodeName().equals(
-                                        "TestPeriod")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        testPeriod = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(testPeriod);
-                                    }
-                                } else if (node.getNodeName().equals("TestFee")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        testFee = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(testFee);
-                                    }
-                                } else if (node.getNodeName().equals("DeptID")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        deptID = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(deptID);
-                                    }
-                                } else if (node.getNodeName().equals("TestGroupID")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        testGroupID = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(deptID);
-                                    }
-                                } else if (node.getNodeName().equals("TestGroupName")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        testGroupName = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(deptID);
-                                    }
-                                } else if (node.getNodeName().equals("DefaultUserID")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        defaultUserID = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(deptID);
-                                    }
-                                } else if (node.getNodeName().equals("DefaultUserName")) {
-                                    if (node.getChildNodes().getLength() != 0) {
-                                        defaultUserName = node.getFirstChild()
-                                                .getNodeValue();
-                                        //System.out.println(deptID);
-                                    }
-                                }
-                            }
-                        }
-                        if("赭曲霉毒素A".equals(itemName) || "氨基甲酸乙酯".equals(itemName) ){
-                            System.out.println(itemCode+"--"+itemName);
-                        }
-                        System.out.println("save item--"+ "itemCode: "+ itemCode + " itemName: "+itemName + " testItemID: "+testItemID + " testItemCode: "+testItemCode+" itemID: "+itemID
-                                +" standardNo: "+standardNo);
-                        SaveLabItemDao("food", itemCode, itemName, testItemID, testItemCode, itemID, standardNo, standardName, productCategoryCode, productCategoryName, detectionLimit, resultUnit, limit, testPeriod, testFee, deptID,testGroupID,testGroupName,defaultUserID,defaultUserName);
-                        //DaoTask1.SaveLabItemDao("hzp", itemCode, itemName, testItemID, testItemCode, itemID, standardNo, standardName, productCategoryCode, productCategoryName, detectionLimit, resultUnit, limit, testPeriod, testFee, deptID,testGroupID,testGroupName,defaultUserID,defaultUserName);
-                        }                       
-                    }
-                }
-            
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-            //e.printStackTrace();
-            log.error(e);
-        } catch (IllegalStateException e) {
-            // TODO Auto-generated catch block
-            //e.printStackTrace();
-            log.error(e);
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            //e.printStackTrace();
-            log.error(e);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            //e.printStackTrace();
-            log.error(e);
-        } catch (ParserConfigurationException e) {
-            //e.printStackTrace();
-            log.error(e);
-        } catch (SAXException e) {
-            //e.printStackTrace();
-            log.error(e);
-        } catch (Exception e) {
-            //e.printStackTrace();
-            log.error("错误",e);
-        } finally {
-            httpclient.getConnectionManager().shutdown();
-        }
-       // labItem=true;
-        return "success";
-    }
-
-	
-	static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    static final String URL = "jdbc:sqlserver://172.16.36.225:1433;databaseName=test";
-    static final String USER = "aaa";
-    static final String PWD = "aa";
-    
-    public static Connection getConnection() {
-        Connection con = null;
-        try {
-            Class.forName(DRIVER);
-            con = DriverManager.getConnection(URL, USER,PWD);
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return con;
-    }
-    
-    public static void SaveLabItemDao(String url,
-            String itemCode,String itemName,String testItemID,String testItemCode,String itemID,String standardNo,
-            String standardName,String productCategoryCode,String productCategoryName,String detectionLimit,String resultUnit,String limit,String testPeriod,String testFee,String deptID,String testGroupID,String testGroupName,String defaultUserID,String defaultUserName) throws SQLException{
-        //Connection conn = ConPool.getConnection(url,user,psw);
-        Connection conn=getConnection();
-        CallableStatement proc = null;
-        String wCall = null;
-        wCall = "{call Pro_SaveLabItem(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";        //只能保存一条数据，是不是itemCode相同自动替换而不是添加？
-        try {
-            proc = conn.prepareCall(wCall);
-            proc.setString(1, itemCode);
-            proc.setString(2, itemName);
-            proc.setString(3, testItemID);
-            proc.setString(4, testItemCode);
-            proc.setString(5, itemID);     
-            proc.setString(6, standardNo);                
-            proc.setString(7, standardName);     
-            proc.setString(8,productCategoryCode);    //样品类别已改名为适用范围
-            proc.setString(9,productCategoryName);
-            proc.setString(10,detectionLimit);
-            proc.setString(11,resultUnit);
-            proc.setString(12,limit);
-            proc.setString(13,testPeriod);
-            proc.setString(14,testFee);
-            proc.setString(15,deptID);
-            proc.setString(16, testGroupID);
-            proc.setString(17, testGroupName);
-            proc.setString(18, defaultUserID);
-            proc.setString(19,defaultUserName);
-            proc.execute();
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }finally{
-            try {
-                if(proc!=null)
-                    proc.close();
-                if(conn!=null)
-                    conn.close();
-            } catch (SQLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }   
-    }
-    
-    public static void DelLabOutdatedParamDao(String url) throws SQLException{
-        //Connection conn = ConPool.getConnection(url,user,psw);
-        Connection conn=getConnection();
-        CallableStatement proc = null;
-        String wCall = null;
-        wCall = "{call Pro_DelLabOutdatedParam()}";
-        try {
-            proc = conn.prepareCall(wCall);
-            proc.execute();
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }finally{
-            try {
-                if(proc!=null)
-                    proc.close();
-                if(conn!=null)
-                    conn.close();
-            } catch (SQLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }   
-    }
-    
-    
-	public static void main(String[] args) throws SQLException {	    
-	 
-        File file = new File("D://22.xml");  
-        new Task1().SaveLabItem2(file);
-        DelLabOutdatedParamDao("food");
-        
-    }
 	
 	public String SaveLabSampleDisposal() {
 		labSampleDisposal=true;
