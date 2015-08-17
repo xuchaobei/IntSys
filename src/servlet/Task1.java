@@ -709,7 +709,7 @@ public class Task1 extends TimerTask {
 				rd.close();
 				stream.close();
 				result = temp.toString();
-				ExportXml.export(result,"检测项目");       //导出结果到xml文件
+				//ExportXml.export(result,"检测项目");       //导出结果到xml文件
 				//System.out.println(result);
 				rr = new StringReader(result);
 				builderFactory = DocumentBuilderFactory.newInstance();
